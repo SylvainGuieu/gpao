@@ -34,6 +34,8 @@ class DmDeHk:
     dmdeip: str
     socket_instance: socket.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     def connect(self)->None:
+        self.socket_instance.close()
+        self.socket_instance  = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket_instance.connect( (self.dmdeip, SSH_PORT) )
     
     def disconnect(self)->None:
