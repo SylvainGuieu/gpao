@@ -1,5 +1,8 @@
 from dataclasses import dataclass
 import time
+import sys
+
+sys.path.append( r'C:\Program Files\Alpao\SDK\Samples\Python3') 
 from Lib64.asdk import DM as _DM
 import numpy as np
 
