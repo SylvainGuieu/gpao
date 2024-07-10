@@ -8,7 +8,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-pydevmgr-vlt = "^0.5.dev0"
+pydevmgr-vlt = "0.5.dev0"
 numpy = "1.23"
 matplotlib = "^3.9.1"
 scipy = "1.13"
