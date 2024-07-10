@@ -63,10 +63,9 @@ def alpao43_calib(dm_property: core.IDmProperty)->core.DmCalib:
 
 def alpao43_command(serial_name:str, use_flat:bool = True)->core.DmCommand:
     prop = alpao43_property(serial_name)
-    if use_flat:
-        calib = alpao43_default_calib(prop)
-    else:
-        calib = alpao43_calib(prop)
+    calib = alpao43_calib(prop)
+    if not use_flat:
+        calib.flat *= 0.0
     return core.DmCommand(prop, calib)
 
 if __name__ == "__main__":

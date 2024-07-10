@@ -32,7 +32,7 @@ def get_io(serial_name:str)->IConfigIo:
 
 def read_lut(path:str)->list[int]:
     with open( path ) as f:
-            cfg = json.load( f) 
+        cfg = json.load( f) 
     return cfg['LUT']
 
 @dataclass
