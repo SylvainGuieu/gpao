@@ -88,7 +88,7 @@ class Checker:
     warning_treshold: float = 0.004
     def check(self, measurement: Measurement)->None:
         if measurement.current< self.warning_treshold:
-            print( "WARNING ", f"Weak current for {measurement}")
+            print( "WARNING ", f"Weak current for {measurement.actnum}={measurement.current} A ; cable {measurement.cable_number}")
         print (f"{measurement.actnum}", end=" ")
 
 @dataclass
@@ -116,12 +116,12 @@ class PlugTestScope:
 
         ax.clear()
         data = self.data[-nlast:None]
-        acton = [m.actnum  for m in data if m.amplitude>0.0]
-        on =  [m.current1 for m in data if m.amplitude>0.0] 
+        acton = [m.actnum  for m in data]
+        c1 =  [m.current1 for m in data] 
         
-        ax.plot(acton,  on, 'k*' )       
-        on =  [m.current2 for m in data if m.amplitude>0.0]     
-        ax.plot(acton,  on, 'k+' )
+        ax.plot(acton,  c1, 'k*' )       
+        c2 =  [m.current2 for m in data]     
+        ax.plot(acton,  c2, 'k+' )
         ax.set_xlabel("act")
         ax.set_ylabel("current [A]")
 

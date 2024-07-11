@@ -3,7 +3,7 @@ import json
 import socket
 from typing import NamedTuple
 import requests
-
+import math 
 from gpao.core.ihk import IDmDeHk, HkData
 
 SSH_PORT = 1665
@@ -28,22 +28,50 @@ def hkl_cmd(sockid: socket.socket, msg:bytes)->HkResponse:
 def _extract_current(s: str):
     return float( s.replace('CURRENT', '').replace(' A','') )
 
+@dataclass
+class Connector:
+    hk: IDmDeHk
+    was_connected: bool = False 
+    def __enter__(self):
+        if self.hk.is_connected() :
+            self.was_connected = True 
+        else:
+            self.was_connected = False 
+            self.hk.connect()
+        return self.hk 
+    
+    def __exit__(self, *args)->bool:
+        if not self.was_connected:
+            self.hk.disconnect()
+        return False
+        
+        
+
 
 @dataclass
 class DmDeHk:
     dmdeip: str
     socket_instance: socket.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    _connected: bool = False
+    
+    def is_connected(self)->bool:
+        return self._connected 
+
     def connect(self)->None:
         self.socket_instance.close()
         self.socket_instance  = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket_instance.connect( (self.dmdeip, SSH_PORT) )
+        self._connected = True
     
     def disconnect(self)->None:
         self.socket_instance.close()
+        self._connected = False
 
     def get_current(self)->float:
-        r = hkl_cmd(self.socket_instance, CURENT_COMMAND)
-        return _extract_current(r.response)
+        with Connector(self):
+            r = hkl_cmd(self.socket_instance, CURENT_COMMAND)
+            return _extract_current(r.response)
+        return math.nan
 
     def get_hk_data(self)->HkData:
         f = requests.get(f"http://{self.dmdeip}:{HTTP_PORT}")
@@ -105,4 +133,5 @@ class DmDeHks:
     def __exit__(self,*args):
         self.disconnect()
 
-
+def house_keepings(*ips:str)->DmDeHks:
+    return DmDeHks( *(DmDeHk(ip) for ip in ips) )

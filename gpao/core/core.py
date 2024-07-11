@@ -7,9 +7,11 @@ from gpao.core.config import (
     DmConfigIo as DmConfigIo, 
     register_io as register_io, 
     get_io as get_io, 
+    register_ips as register_ips, 
+    get_ips as get_ips, 
     get_config_root as get_config_root, 
     set_config_root as set_config_root, 
-    read_lut as read_lut
+    read_lut as read_lut,
 )
 from gpao.core.imodel import ( 
     IDmPattern as IDmPattern
@@ -24,12 +26,14 @@ from gpao.core.idm import (
     IDmProperty as IDmProperty, 
     IDmCommand as IDmCommand, 
     IDmCalibration as IDmCalibration, 
+    IDm as IDm, 
 )
 
 from gpao.core.dm import ( 
     DmProperty as DmProperty, 
     DmCalib as DmCalib, 
     DmCommand as DmCommand, 
+    Dm as Dm, 
 )
 
 from gpao.core.idmcom import (
@@ -46,11 +50,13 @@ from gpao.core.hk import(
     DmDeHk as DmDeHk, 
     DmDeHks as DmDeHks, 
     DmDeHkSim as DmDeHkSim,
+    house_keepings as house_keepings, 
 )
 
 from gpao.core.dmcomsim import (
     DmComSim as DmComSim
 )
+
 
 try:
     from gpao.core.dmcom import (

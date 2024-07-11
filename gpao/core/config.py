@@ -18,6 +18,9 @@ def set_config_root(root:str):
 config_io_loockup: dict[str,IConfigIo] = {
 
 }
+config_ips_loockup: dict[str,tuple[str,...]] = {
+
+}
 def register_io(
         serial_name: str, 
         io: IConfigIo 
@@ -29,6 +32,17 @@ def get_io(serial_name:str)->IConfigIo:
         return config_io_loockup[serial_name]
     except KeyError:
         raise ValueError(f"Cannot found mat file for {serial_name}")
+
+def register_ips(serial_name: str , *ips):
+    config_ips_loockup[serial_name] = ips 
+
+def get_ips(serial_name: str)->tuple[str,...]:
+    try:
+        return config_ips_loockup[serial_name]
+    except KeyError:
+        raise ValueError(f"Cannot found ip addresses for {serial_name}")
+
+
 
 def read_lut(path:str)->list[int]:
     with open( path ) as f:

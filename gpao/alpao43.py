@@ -27,6 +27,9 @@ core.register_io('BAX655',
                  core.DmConfigIo('BAX655_Flat_T20.mat', 'BAX655.json')
                  )
 
+
+
+
 def alpao43_dm_pattern(pitch:float=2.62)->core.DmPattern:
     pattern = core.build_pattern(
             43, pitch,  
@@ -61,12 +64,30 @@ def alpao43_calib(dm_property: core.IDmProperty)->core.DmCalib:
     kl : np.ndarray= compute_KL_GPAO(nact=dm_property.act_box[0], pup_fraction=1.0) # type:ignore #mixed return 
     return core.DmCalib(flat=flat, kl=kl.T, lut=io.read_lut())
 
-def alpao43_command(serial_name:str, use_flat:bool = True)->core.DmCommand:
+def alpao43_command(serial_name:str, use_flat:bool = True, simulated:bool=False)->core.DmCommand:
+        
     prop = alpao43_property(serial_name)
-    calib = alpao43_calib(prop)
-    if not use_flat:
-        calib.flat *= 0.0
+
+    if simulated:
+        calib = alpao43_default_calib(prop) 
+    else:    
+        calib = alpao43_calib(prop)
+        if not use_flat:
+            calib.flat *= 0.0
     return core.DmCommand(prop, calib)
 
+
+def alpao43(
+        serial_name: str, 
+        ips:tuple[str,...]|None = None, 
+        simulated:bool =False
+    )->core.Dm:
+    return core.Dm( 
+        alpao43_command(serial_name, simulated=simulated), 
+        core.new_com(serial_name=serial_name, simulated=simulated), 
+        None if ips is None else core.house_keepings(*ips) 
+    )
+
+
 if __name__ == "__main__":
-    print( alpao43_default_calib(alpao43_property('B')))
+    print( alpao43('BAX651', simulated=True) )

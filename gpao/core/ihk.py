@@ -43,6 +43,10 @@ class HkData:
 
 
 class IDmDeHk(Protocol):
+    
+    def is_connected(self)->bool:
+        ...
+    
     def connect(self)->None:
         ...
 

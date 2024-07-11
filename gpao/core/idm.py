@@ -5,6 +5,7 @@ import abc
 from typing import Protocol
 import numpy as np
 from numpy.typing import ArrayLike
+from gpao.core.ihk import HkData
 from gpao.core.imodel import IDmPattern 
 
 class IDmProperty(Protocol):
@@ -55,3 +56,33 @@ class IDmCommand(Protocol):
 
 
 
+class IDm(Protocol):
+    def get_property(self)->IDmProperty:
+        ...
+    
+    def get_calibration(self)->IDmCalibration:
+        ... 
+    
+    def send_actuator(self,  act:int, amplitude:float)->None:
+        ... 
+        
+    def send_group(self, act:int, size:float, amplitude:float)->None:
+        ... 
+
+    def send_flat(self)->None:
+        ...
+
+    def send_rest(self)->None:
+        ...
+    
+    def reset(self)->None:
+        ...
+
+    def send_kl(self, mode:int, amplitude:float)->None:
+        ...
+    
+    def get_hk_data(self)->tuple[HkData, ...]:
+        ...
+
+    def get_current(self)->tuple[float,...]:
+        ...

@@ -1,7 +1,9 @@
 from __future__ import annotations
 from dataclasses import dataclass
 import numpy as np
-from gpao.core.idm import IDmCalibration, IDmProperty
+from gpao.core.idm import IDmCalibration, IDmCommand, IDmProperty
+from gpao.core.idmcom import IDmCom
+from gpao.core.ihk import HkData, IDmDeHks
 from gpao.core.imodel import IDmPattern
 
 @dataclass
@@ -76,3 +78,44 @@ class DmCommand:
     def kl(self, mode:int, amplitude:float)->np.ndarray:
         return  self.calib.get_flat() + amplitude*self.calib.get_kl()[mode]
 
+
+@dataclass
+class Dm:
+    cmd: IDmCommand
+    com: IDmCom
+    hks: IDmDeHks| None = None
+
+    def get_property(self)->IDmProperty:
+        return self.cmd.get_property()
+
+    def get_calibration(self)->IDmCalibration:
+        return self.cmd.get_calibration()
+
+    def send_actuator(self,  act:int, amplitude:float)->None:
+        self.com.send( self.cmd.actuator(act, amplitude))
+
+    def send_group(self, act:int, size:float, amplitude:float)->None:
+        self.com.send( self.cmd.group(act, size, amplitude) ) 
+
+    def send_flat(self)->None:
+        self.com.send( self.cmd.flat() ) 
+
+    def send_rest(self)->None:
+        self.com.send( self.cmd.rest() ) 
+    
+    def reset(self)->None:
+        self.send_rest()
+
+    def send_kl(self, mode:int, amplitude:float)->None:
+        self.com.send( self.cmd.kl( mode, amplitude) )
+    
+    def get_hk_data(self)->tuple[HkData, ...]:
+        if self.hks is None:
+            raise ValueError("This instance has no DM House keeping connection")
+        return self.hks.get_hk_data()
+
+    def get_current(self)->tuple[float,...]:
+        if self.hks is None:
+            raise ValueError("This instance has no DM House keeping connection")
+        return self.hks.get_current() 
+        
