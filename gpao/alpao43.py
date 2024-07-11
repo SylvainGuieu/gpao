@@ -85,7 +85,7 @@ def alpao43(
     return core.Dm( 
         alpao43_command(serial_name, simulated=simulated), 
         core.new_com(serial_name=serial_name, simulated=simulated), 
-        None if ips is None else core.house_keepings(*ips) 
+        None if ips is None else core.house_keepings(*ips, simulated=simulated) 
     )
 
 

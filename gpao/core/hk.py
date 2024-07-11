@@ -87,6 +87,10 @@ class DmDeHk:
 
 @dataclass
 class DmDeHkSim:
+
+    def is_connected(self)->bool:
+        return True 
+
     def connect(self)->None:
         pass
     
@@ -133,5 +137,8 @@ class DmDeHks:
     def __exit__(self,*args):
         self.disconnect()
 
-def house_keepings(*ips:str)->DmDeHks:
-    return DmDeHks( *(DmDeHk(ip) for ip in ips) )
+def house_keepings(*ips:str, simulated:bool= False)->DmDeHks:
+    if simulated:
+        return  DmDeHks( *(DmDeHkSim() for _ in ips) )
+    else:
+        return DmDeHks( *(DmDeHk(ip) for ip in ips) )

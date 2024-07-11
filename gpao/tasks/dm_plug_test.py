@@ -48,30 +48,22 @@ class Measurement:
 
 @dataclass
 class PlugTestRunner:
-    dmcmd: core.IDmCommand
-    hks: core.DmDeHks
-    dmcom: core.IDmCom|None = None
+    dm: core.IDm
     setting: RunnerSetting = RunnerSetting()
     
     log: logging.Logger = logging.getLogger("dm_plug_test")
     log.setLevel(logging.INFO)
     
     def run(self, callback:Callable[[Measurement], None] = lambda m:None): 
-        if self.dmcom:
-            dmcom= self.dmcom
-        else:
-            dmcom = core.new_com( self.dmcmd.get_property().serial_name )
-        
-        self.hks.connect()
-        get_cable_number = self.dmcmd.get_calibration().get_cable_number
+        get_cable_number = self.dm.get_calibration().get_cable_number
         try:
-            self.hks.get_current()
-            for act in range(self.dmcmd.get_property().nact):
-                dmcom.send ( self.dmcmd.rest() )
-                cb1, cb2 = self.hks.get_current()
+            self.dm.get_current()
+            for act in range(self.dm.get_property().nact):
+                self.dm.reset()
+                cb1, cb2 = self.dm.get_current()
                 
-                dmcom.send( self.dmcmd.actuator(act, self.setting.act_amp ) )
-                c1, c2 = self.hks.get_current()
+                self.dm.send_actuator(act, self.setting.act_amp )
+                c1, c2 = self.dm.get_current()
                     
                 m = Measurement(act, self.setting.act_amp, 
                                 current1 = c1-cb1, 
@@ -80,8 +72,7 @@ class PlugTestRunner:
                             )
                 callback(m)
         finally:
-            dmcom.send ( self.dmcmd.rest() )
-            self.hks.disconnect()
+            self.dm.reset()
     
 @dataclass 
 class Checker:
@@ -125,24 +116,15 @@ class PlugTestScope:
         ax.set_xlabel("act")
         ax.set_ylabel("current [A]")
 
-def plug_test_runner(serial_name:str, simulated:bool = False)->PlugTestRunner:
-    dmcmd = alpao43_command(serial_name)
-    if simulated:
-        hks = core.DmDeHks( core.DmDeHkSim(), core.DmDeHkSim())
-    else:
-        ip1, ip2 = ip_loockup[serial_name]
-        hks =  core.DmDeHks(core.DmDeHk(ip1), core.DmDeHk(ip2))
 
-    return  PlugTestRunner(
-            dmcmd=dmcmd, hks=hks, 
-            dmcom=core.new_com(serial_name, simulated)
-        )
 
 
 if __name__ == "__main__":
-
-
-    runner = plug_test_runner('BAX651', True)
+    from gpao.alpao43 import alpao43 
+    runner = PlugTestRunner(
+        alpao43('BAX651', ips=('134.171.240.144', "134.171.240.145"),
+                simulated=True)
+        )
     plotter = PlugTestScope()
     runner.run( plotter.plot_new )
     
