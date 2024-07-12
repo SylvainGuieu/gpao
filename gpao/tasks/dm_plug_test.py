@@ -107,16 +107,21 @@ class PlugTestScope:
 
         ax.clear()
         data = self.data[-nlast:None]
-        acton = [m.actnum  for m in data]
-        c1 =  [m.current1 for m in data] 
+        act = np.asarray( [m.actnum  for m in data] )
         
-        ax.plot(acton,  c1, 'k*' )       
-        c2 =  [m.current2 for m in data]     
-        ax.plot(acton,  c2, 'k+' )
+        c  =  np.asarray( [m.current for m in data] )
+        c1 =  np.asarray( [m.current1 for m in data] )
+        c2 =  np.asarray( [m.current2 for m in data] )    
+        
+        ax.plot(act,  c1, 'k*' )       
+        ax.plot(act,  c2, 'k+' )
+         
+        bad = c<self.warning_treshold 
+        ax.plot(act[bad],  c1[bad], 'r*' )       
+        ax.plot(act[bad],  c2[bad], 'r+' )
+
         ax.set_xlabel("act")
         ax.set_ylabel("current [A]")
-
-
 
 
 if __name__ == "__main__":

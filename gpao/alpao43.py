@@ -80,10 +80,11 @@ def alpao43_command(serial_name:str, use_flat:bool = True, simulated:bool=False)
 def alpao43(
         serial_name: str, 
         ips:tuple[str,...]|None = None, 
+        use_flat: bool = True, 
         simulated:bool =False
     )->core.Dm:
     return core.Dm( 
-        alpao43_command(serial_name, simulated=simulated), 
+        alpao43_command(serial_name, use_flat=use_flat, simulated=simulated), 
         core.new_com(serial_name=serial_name, simulated=simulated), 
         None if ips is None else core.house_keepings(*ips, simulated=simulated) 
     )

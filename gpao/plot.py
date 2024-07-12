@@ -6,11 +6,15 @@ import functools
 @dataclass
 class AxesMaker:
     figure: int|str|None = None
-    
-    @functools.cached_property
-    def axes(self):
-        return plt.figure(self.figure).add_subplot(1,1,1)
+    show: bool = True 
 
-    def get_axes(self):
+    @functools.cached_property
+    def axes(self)->Axes:
+        fig = plt.figure(self.figure)
+        ax = fig.add_subplot(1,1,1)
+        if self.show: fig.show()
+        return ax
+
+    def get_axes(self)->Axes:
         return self.axes
             
